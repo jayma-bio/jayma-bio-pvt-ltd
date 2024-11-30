@@ -4,6 +4,7 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { cn } from "@/lib/utils";
+import NextTopLoader from "nextjs-toploader";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -31,6 +32,7 @@ export default function RootLayout({
       <body
         className={cn(`scroll-smooth overflow-x-hidden `, poppins.className)}
       >
+        <NextTopLoader color="#0D2A25" />
         {children}
         <Toaster />
       </body>
