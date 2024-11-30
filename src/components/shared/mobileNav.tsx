@@ -7,14 +7,21 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "../ui/button";
 import Image from "next/image";
+import { logout } from "@/actions/logout";
 import { useState } from "react";
 import { GiShoppingBag } from "react-icons/gi";
 
+interface MobileNavbarProps {
+  user: any;
+}
 
-
-export const MobileNavbar = () => {
+export const MobileNavbar = ({ user }: MobileNavbarProps) => {
   const [sheetClose, setSheetClose] = useState(false);
   const pathname = usePathname();
+  const onClick = () => {
+    logout();
+  };
+
   const handleSheetClose = () => {
     setSheetClose(false);
   };
@@ -76,7 +83,7 @@ export const MobileNavbar = () => {
                   );
                 })}
               </div>
-              {/* {user ? (
+              {user ? (
                 <div className="flex flex-col gap-3" onClick={handleSheetClose}>
                   <Link href={"/profile"}>
                     <Button className="px-4 py-2 bg-white border border-green/60 hover:bg-white flex items-center justify-between rounded-xl w-full">
@@ -108,6 +115,19 @@ export const MobileNavbar = () => {
                       </Button>
                     </Link>
                   )}
+                  <Button
+                    onClick={onClick}
+                    className="px-4 py-2 bg-green hover:bg-green/90 flex items-center justify-between rounded-xl w-full border-none"
+                  >
+                    <span className="text-white text-medium">Logout</span>
+                    <Image
+                      src="/landing/nav/logout.svg"
+                      alt="Profile Picture"
+                      width={18}
+                      height={18}
+                      className="shrink-0 text-white"
+                    />
+                  </Button>
                 </div>
               ) : (
                 <div className="flex flex-col gap-3" onClick={handleSheetClose}>
@@ -120,7 +140,7 @@ export const MobileNavbar = () => {
                     </Button>
                   </Link>
                 </div>
-              )} */}
+              )}
             </div>
           </div>
         </SheetContent>
