@@ -1,0 +1,5 @@
+/* Base theme */
+.bn-container[data-theming-css-variables-demo][data-color-scheme="dark"] {
+  --bn-colors-editor-background: #d9e6ba;
+  --bn-colors-editor-text: #000;
+}
