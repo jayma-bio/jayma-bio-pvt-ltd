@@ -1,16 +1,19 @@
 "use client";
 import { MenuItem } from "@/constants/landing/menuItem";
-
+import { MobileNavbar } from "./mobileNav";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
+import { useUserData } from "@/hooks/user-data";
+import { UserNav } from "./user-nav";
 import { LogIn } from "lucide-react";
-import { MobileNavbar } from "./mobileNav";
 
 const Navbar = () => {
   const pathname = usePathname();
+  const { user } = useUserData();
+
   return (
     <nav className="fixed top-0 left-0 right-0 w-full py-3 px-5 md:px-6 z-30 bg-white/90 border-b border-gray-200 backdrop-blur-lg">
       <div className="max-w-screen-2xl mx-auto flex items-center justify-between 2xl:px-8">
@@ -81,7 +84,16 @@ const Navbar = () => {
           </div>
         </div>
 
-        <MobileNavbar />
+        {user ? (
+          <UserNav user={user} />
+        ) : (
+          <Link href="/auth/login" className="hidden lg:block">
+            <Button className="w-[70px] h-[40px] rounded-full bg-green hover:bg-green/90">
+              <LogIn className="size-10 shrink-0" />
+            </Button>
+          </Link>
+        )}
+        <MobileNavbar user={user} />
       </div>
     </nav>
   );

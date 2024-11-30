@@ -2,12 +2,16 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 
 import "./globals.css";
-import { Toaster } from "@/components/ui/toaster";
 import { cn } from "@/lib/utils";
 import NextTopLoader from "nextjs-toploader";
 import CookieConsent from "@/components/shared/cookie";
 import Script from "next/script";
 import dynamic from "next/dynamic";
+import { Toaster } from "@/components/ui/sonner";
+import { SessionProvider } from "next-auth/react";
+import { auth } from "../../auth";
+import { ModalProvider } from "@/providers/modal-provider";
+import ClientUsernameModalSetter from "@/components/renderers/ClientUsernameModalSetter";
 
 const Loader = dynamic(() => import("@/components/shared/loader"), {
   ssr: false,
@@ -29,12 +33,19 @@ export const metadata: Metadata = {
   manifest: "./manifest.json",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
+  const session = await auth();
+
+  const showUsernameModal =
+    session?.user.username === null || session?.user.username === undefined;
+
   return (
+    <SessionProvider session={session}>
     <html lang="en" suppressHydrationWarning>
       <head>
         <style>{`
@@ -52,6 +63,8 @@ export default function RootLayout({
           <Loader />
         </div>
         <div id="content">
+        {showUsernameModal && <ClientUsernameModalSetter/>}
+        <ModalProvider />
           <NextTopLoader color="#0D2A25" />
           {children}
           <Toaster />
@@ -69,5 +82,6 @@ export default function RootLayout({
         <CookieConsent />
       </body>
     </html>
+    </SessionProvider>
   );
 }
