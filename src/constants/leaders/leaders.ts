@@ -1,8 +1,8 @@
 export const ExecutiveLeadersDetails = [
   {
-    name: "Dr. Balasubramanian Paramasivan",
+    name: "Karthika Parvathy",
     image: "/leaders/one.png",
-    role: "Non-Executive Director & Chief Scientific Advisor",
+    role: "Founder and Director",
     instagram: "",
     linkedin:
       "https://www.linkedin.com/in/balasubramanian-paramasivan-1ab72a8/",

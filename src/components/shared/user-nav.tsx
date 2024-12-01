@@ -92,7 +92,7 @@ export function UserNav({ user }: UserNavProps) {
           )}
 
           <DropdownMenuItem className="hover:cursor-pointer" asChild>
-            <Link href="/orders" className="flex items-center">
+            <Link href="/cart" className="flex items-center">
               <ShoppingCart className="w-4 h-4 mr-3 text-muted-foreground" />
               Manage Cart
             </Link>
