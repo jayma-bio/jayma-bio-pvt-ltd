@@ -11,7 +11,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "../../auth";
 import { ModalProvider } from "@/providers/modal-provider";
-import ClientUsernameModalSetter from "@/components/renderers/ClientUsernameModalSetter";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import AdSense from "./adsense";
 
 const Loader = dynamic(() => import("@/components/shared/loader"), {
@@ -65,6 +66,8 @@ export default async function RootLayout({
             <NextTopLoader color="#0D2A25" />
             {children}
             <Toaster />
+            <Analytics />
+            <SpeedInsights />
           </div>
 
           <Script id="show-page" strategy="afterInteractive">
