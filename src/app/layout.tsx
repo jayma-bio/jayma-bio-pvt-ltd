@@ -12,6 +12,7 @@ import { SessionProvider } from "next-auth/react";
 import { auth } from "../../auth";
 import { ModalProvider } from "@/providers/modal-provider";
 import ClientUsernameModalSetter from "@/components/renderers/ClientUsernameModalSetter";
+import AdSense from "./adsense";
 
 const Loader = dynamic(() => import("@/components/shared/loader"), {
   ssr: false,
@@ -38,7 +39,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   const session = await auth();
 
   const showUsernameModal =
@@ -46,42 +46,43 @@ export default async function RootLayout({
 
   return (
     <SessionProvider session={session}>
-    <html lang="en" suppressHydrationWarning>
-      <head>
-        <style>{`
+      <html lang="en" suppressHydrationWarning>
+        <head>
+          <AdSense  pId="8331809888604693"/>
+          <style>{`
           #content { display: none; }
           #loader { display: flex; }
         `}</style>
-      </head>
-      <body
-        className={cn(`scroll-smooth overflow-x-hidden `, poppins.className)}
-      >
-        <div
-          id="loader"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-white"
+        </head>
+        <body
+          className={cn(`scroll-smooth overflow-x-hidden `, poppins.className)}
         >
-          <Loader />
-        </div>
-        <div id="content">
-        {showUsernameModal && <ClientUsernameModalSetter/>}
-        <ModalProvider />
-          <NextTopLoader color="#0D2A25" />
-          {children}
-          <Toaster />
-        </div>
+          <div
+            id="loader"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-white"
+          >
+            <Loader />
+          </div>
+          <div id="content">
+            {showUsernameModal && <ClientUsernameModalSetter />}
+            <ModalProvider />
+            <NextTopLoader color="#0D2A25" />
+            {children}
+            <Toaster />
+          </div>
 
-        <Script id="show-page" strategy="afterInteractive">
-          {`
+          <Script id="show-page" strategy="afterInteractive">
+            {`
             function showContent() {
               document.getElementById('loader').style.display = 'none';
               document.getElementById('content').style.display = 'block';
             }
             setTimeout(showContent, 2000);
           `}
-        </Script>
-        <CookieConsent />
-      </body>
-    </html>
+          </Script>
+          <CookieConsent />
+        </body>
+      </html>
     </SessionProvider>
   );
 }

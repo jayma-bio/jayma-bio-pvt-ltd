@@ -54,6 +54,11 @@ const CartDetails = ({ userId }: CartDetailsProps) => {
   const cart = useCart();
   const { shipping, tax } = usePaymentManagement();
 
+  if (!user) {
+    router.push("/auth/login");
+    return null;
+  }
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
