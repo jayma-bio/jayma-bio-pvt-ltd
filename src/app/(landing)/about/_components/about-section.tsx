@@ -11,10 +11,10 @@ import { Autoplay } from "swiper/modules";
 import "swiper/css";
 import { MoveUpRight } from "lucide-react";
 
-// interface AboutUsSectionProps {
-//   supports: any;
-// }
-const AboutUsSection = () => {
+interface AboutUsSectionProps {
+  supports: any;
+}
+const AboutUsSection = ({ supports }: AboutUsSectionProps) => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -277,7 +277,7 @@ const AboutUsSection = () => {
             </h3>
           </div>
 
-          {/* <div className="w-full flex items-center justify-center md:justify-start flex-wrap gap-6 md:gap-10">
+          <div className="w-full flex items-center justify-center md:justify-start flex-wrap gap-6 md:gap-10">
             {supports?.map((support: any, index: number) => (
               <img
                 key={index}
@@ -286,7 +286,7 @@ const AboutUsSection = () => {
                 className="w-40 h-auto object-contain select-none pointer-events-none"
               />
             ))}
-          </div> */}
+          </div>
         </div>
       </div>
     </section>
