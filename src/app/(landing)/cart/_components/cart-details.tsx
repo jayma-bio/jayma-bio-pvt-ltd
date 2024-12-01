@@ -48,12 +48,13 @@ const formSchema = z.object({
 });
 
 const CartDetails = ({ userId }: CartDetailsProps) => {
-  const [checkoutLoading, setCheckoutLoading] = useState(false);
-  const { user } = useUserData();
   const router = useRouter();
+  const { user } = useUserData();
   const cart = useCart();
   const { shipping, tax } = usePaymentManagement();
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
 
+  // Always call useForm, even if user is not present
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -64,6 +65,7 @@ const CartDetails = ({ userId }: CartDetailsProps) => {
     },
   });
 
+  // Always compute these useMemo values
   const priceAfterDiscount = useMemo(() => {
     return cart.items.reduce((total: number, item) => {
       const price = item.discount
@@ -77,13 +79,22 @@ const CartDetails = ({ userId }: CartDetailsProps) => {
     return priceAfterDiscount + priceAfterDiscount * (tax / 100) + shipping;
   }, [priceAfterDiscount, tax, shipping]);
 
+  // Check for user and redirect if not present
+  if (!user) {
+    router.push("/auth/login");
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Redirecting to login...
+      </div>
+    );
+  }
+
   const onCheckOut = async (formData: any) => {
     try {
       setCheckoutLoading(true);
       const URL = await getUrl().then((data) => {
         if (data.data) {
           return `${data.data.baseUrl}/${data.data.storeId}`;
-          // return `http://localhost:3001/api/${data.data.storeId}`;
         }
       });
 

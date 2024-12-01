@@ -61,7 +61,6 @@ export function SetUsernameModel() {
           }
           if (data.success) {
             setSuccess(data.success);
-            onClose();
             router.refresh();
           }
         })

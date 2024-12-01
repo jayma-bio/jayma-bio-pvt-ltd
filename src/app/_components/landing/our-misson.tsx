@@ -21,7 +21,7 @@ const MissionSection = () => {
               className="w-full select-none pointer-events-none"
             />
             <div className="absolute top-0 left-0 w-full flex items-center justify-center h-full gap-2 pl-3">
-              <Link href={"/products"}>
+              <Link href={"/categories"}>
                 <span className="text-green">Know more</span>
               </Link>
               <MoveRight className="size-5 md:size-6 shrink-0 text-green" />

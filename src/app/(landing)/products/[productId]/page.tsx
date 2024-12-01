@@ -1,7 +1,6 @@
 import getProduct from "@/actions/products/get-product";
 import getProducts from "@/actions/products/get-products";
 import ProductDetails from "./_components/product-details";
-import { IoIosHeartEmpty } from "react-icons/io";
 import RecommendedProducts from "./_components/recommended-products";
 import { getProductAboutDetailsByCategory } from "@/lib/utils";
 import { Metadata } from "next";

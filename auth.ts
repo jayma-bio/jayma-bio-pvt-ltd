@@ -8,7 +8,6 @@ import { getUserById } from "./src/data/user";
 import { getTwoFactorConfirmationByUserId } from "./src/data/two-factor-confirmation";
 import { getAccountByUserId } from "./src/data/account";
 
-
 export const {
   handlers: { GET, POST },
   auth,
