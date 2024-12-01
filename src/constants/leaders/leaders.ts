@@ -4,8 +4,7 @@ export const ExecutiveLeadersDetails = [
     image: "/leaders/one.png",
     role: "Founder and Director",
     instagram: "",
-    linkedin:
-      "https://in.linkedin.com/in/karthika-parvathy-07583760",
+    linkedin: "https://in.linkedin.com/in/karthika-parvathy-07583760",
     facebook: "",
     x: "",
   },
@@ -14,8 +13,7 @@ export const ExecutiveLeadersDetails = [
     image: "/leaders/two.png",
     role: "Chief of Market Research, Innovation & Scientific Officer, and Director, Kombucha & Cellulose Div",
     instagram: "",
-    linkedin:
-      "https://in.linkedin.com/in/baishali-dey-910b344b",
+    linkedin: "https://in.linkedin.com/in/baishali-dey-910b344b",
     facebook: "",
     x: "",
   },
@@ -42,9 +40,22 @@ export const BoardDirectorDetails = [
     linkedin: "",
   },
   {
+    name: "Baishali Dey",
+    image: "/leaders/four.png",
+    role: "Chief of Market Research, Innovation & Scientific Officer, and Director, Kombucha & Cellulose Div",
+    linkedin: "https://in.linkedin.com/in/baishali-dey-910b344b",
+  },
+  {
+    name: "Anand Babu",
+    image: "/leaders/four.png",
+    role: "Non-Executive Director & CFO",
+    linkedin: "https://in.linkedin.com/in/m-n-anandbabu-61688068",
+  },
+  {
     name: "Shyam Arjunan",
     image: "/leaders/four.png",
     role: "CTO, COO, Chief Policy & Strategy Officer & Director of Sapstudio Div.",
     linkedin: "https://www.linkedin.com/in/shyamarjunan/",
   },
+
 ];
