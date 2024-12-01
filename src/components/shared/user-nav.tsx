@@ -27,6 +27,7 @@ interface UserNavProps {
 export function UserNav({ user }: UserNavProps) {
   const handleLogout = () => {
     logout();
+    window.location.reload();
   };
 
   return (
