@@ -5,7 +5,7 @@ export const ExecutiveLeadersDetails = [
     role: "Founder and Director",
     instagram: "",
     linkedin:
-      "https://www.linkedin.com/in/balasubramanian-paramasivan-1ab72a8/",
+      "https://in.linkedin.com/in/karthika-parvathy-07583760",
     facebook: "",
     x: "",
   },
