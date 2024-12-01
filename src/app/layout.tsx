@@ -41,14 +41,11 @@ export default async function RootLayout({
 }>) {
   const session = await auth();
 
-  const showUsernameModal =
-    session?.user.username === null || session?.user.username === undefined;
-
   return (
     <SessionProvider session={session}>
       <html lang="en" suppressHydrationWarning>
         <head>
-          <AdSense  pId="8331809888604693"/>
+          <AdSense pId="8331809888604693" />
           <style>{`
           #content { display: none; }
           #loader { display: flex; }
@@ -64,7 +61,6 @@ export default async function RootLayout({
             <Loader />
           </div>
           <div id="content">
-            {showUsernameModal && <ClientUsernameModalSetter />}
             <ModalProvider />
             <NextTopLoader color="#0D2A25" />
             {children}

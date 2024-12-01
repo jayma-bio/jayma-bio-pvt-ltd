@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { PanelsTopLeft } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { useStore } from "@/hooks/use-store";
