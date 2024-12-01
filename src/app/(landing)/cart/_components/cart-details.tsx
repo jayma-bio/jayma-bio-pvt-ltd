@@ -31,6 +31,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useUserData } from "@/hooks/user-data";
 
 interface CartDetailsProps {
   userId?: string;
@@ -48,6 +49,7 @@ const formSchema = z.object({
 
 const CartDetails = ({ userId }: CartDetailsProps) => {
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const { user } = useUserData();
   const router = useRouter();
   const cart = useCart();
   const { shipping, tax } = usePaymentManagement();
@@ -55,8 +57,8 @@ const CartDetails = ({ userId }: CartDetailsProps) => {
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      email: "",
+      name: user?.name || "",
+      email: user?.email || "",
       phone: "",
       address: "",
     },

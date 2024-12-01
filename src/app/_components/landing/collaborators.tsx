@@ -1,10 +1,10 @@
 "use client";
 import AnimatedButton from "@/components/animation/button";
 import { MovingCards } from "@/components/shared/moving-card";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import { collaborators } from "@/constants/landing/collaborations";
 import Image from "next/image";
-
-const firstRow = collaborators.slice(0, collaborators.length / 2);
 
 const Collaborators = () => {
   return (
@@ -20,20 +20,27 @@ const Collaborators = () => {
 
       <div className="h-full w-full flex items-center justify-center md:gap-5 gap-2">
         <MovingCards pauseOnHover className="[--duration:50s]">
-          {firstRow.map((image, index) => (
-            <Image
-              key={index}
-              src={image.imgUrl}
-              alt={index.toString()}
-              height={350}
-              width={350}
-              className="shrink-0 rounded-2xl"
-            />
+          {collaborators.map((item, index) => (
+            <Card className="w-[360px] h-full rounded-xl mx-2" key={index}>
+              <img
+                src={item.image}
+                alt="collaborator"
+                className="rounded-t-xl"
+              />
+              <div className="w-full h-full px-4 py-3 flex flex-col gap-2">
+                <p className="text-sm text-green font-medium min-h-[12vh]">
+                  {item.description}
+                </p>
+                {item.fundingAgency}
+                <br />
+                <div className="w-full flex items-center gap-2">
+                  <Badge className="px-2 py-1">{item.timeStamp}</Badge>
+                  <Badge className="px-2 py-1">{item.status}</Badge>
+                </div>
+              </div>
+            </Card>
           ))}
         </MovingCards>
-      </div>
-      <div className="w-full flex items-center justify-center">
-        <AnimatedButton buttonText="Know More" link={"/"} />
       </div>
     </section>
   );

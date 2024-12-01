@@ -21,7 +21,10 @@ const LatestProductsLg = () => {
             )}
           >
             <div
-              className={cn("w-[50%] flex items-center justify-center object-contain", index % 2 !== 0 && "justify-items-end")}
+              className={cn(
+                "w-[50%] flex items-center justify-center object-contain",
+                index % 2 !== 0 && "justify-items-end"
+              )}
             >
               <Image
                 key={index}
@@ -72,7 +75,10 @@ const LatestProductsSm = () => {
                 alt={product.name}
                 width={800}
                 height={100}
-                className={cn("h-[80%] w-full rounded-3xl", index%2 === 0 && "rounded-[25px]")}
+                className={cn(
+                  "h-[80%] w-full rounded-3xl",
+                  index % 2 === 0 && "rounded-[25px]"
+                )}
               />
             </div>
             <div className="w-full flex flex-col items-center justify-center gap-5 md:px-10">
@@ -112,7 +118,7 @@ const LatestProducts = () => {
           <LatestProductsSm />
         </div>
         <div className="flex items-center justify-center pb-5">
-          <AnimatedButton buttonText="All Products" link={"/products"} />
+          <AnimatedButton buttonText="All Products" link={"/categories"} />
         </div>
       </div>
     </section>
