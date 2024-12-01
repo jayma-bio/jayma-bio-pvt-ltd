@@ -18,18 +18,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { logout } from "@/actions/logout";
+import { LogoutButton } from "../auth/logout-button";
 
 interface UserNavProps {
   user: any;
 }
 
 export function UserNav({ user }: UserNavProps) {
-  const handleLogout = () => {
-    logout();
-    window.location.reload();
-  };
-
   return (
     <DropdownMenu>
       <TooltipProvider disableHoverableContent>
@@ -119,11 +114,12 @@ export function UserNav({ user }: UserNavProps) {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-
-        <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
-          <LogOut className="mr-2 h-4 w-4" />
-          <span>Log out</span>
-        </DropdownMenuItem>
+        <LogoutButton>
+          <DropdownMenuItem className="cursor-pointer">
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>Log out</span>
+          </DropdownMenuItem>
+        </LogoutButton>
       </DropdownMenuContent>
     </DropdownMenu>
   );

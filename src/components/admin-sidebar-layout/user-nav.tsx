@@ -19,7 +19,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { currentUser } from "@/lib/auth";
-import { FaUser } from "react-icons/fa";
 import { LogoutButton } from "../auth/logout-button";
 
 export async function UserNav() {
