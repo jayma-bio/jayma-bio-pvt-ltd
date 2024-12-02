@@ -1,7 +1,6 @@
 "use server";
 
 import prismadb from "@/lib/prismadb";
-import { Block } from "@blocknote/core";
 import { UserRole } from "@prisma/client";
 
 type BlogFormValues = {
@@ -17,8 +16,13 @@ type BlogFormValues = {
 
 export default async function addBlogs(data: BlogFormValues) {
   try {
+    const createValue = {
+      ...data,
+      archived: data.role === "ADMIN" ? false : true,
+    };
+
     await prismadb.blog.create({
-      data: data,
+      data: createValue,
     });
 
     return { success: true };
