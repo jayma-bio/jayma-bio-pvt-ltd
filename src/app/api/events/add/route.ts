@@ -7,7 +7,7 @@ export async function POST(req: Request) {
     const body = await req.json();
 
     // Create event with nested socials in a single transaction
-    const event = await prisma.event.create({
+    await prisma.event.create({
       data: body,
     });
 

@@ -12,6 +12,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Event not found" }, { status: 404 });
     }
 
+    await prismadb.event.update({
+      where: { id: id },
+      data: data,
+    });
+
     return NextResponse.json({ message: "Updated successfully", status: 200 });
   } catch (error) {
     console.error("Failed to update event:", error);
