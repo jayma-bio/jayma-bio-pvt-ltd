@@ -158,7 +158,7 @@ const BlogCard = ({
             </div>
           </div>
           <Link href={link}>
-            <Button className="bg-green">Read More</Button>
+            <Button className="bg-green">Read Blog</Button>
           </Link>
         </div>
       </div>

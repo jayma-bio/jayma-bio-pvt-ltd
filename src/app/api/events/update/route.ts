@@ -12,7 +12,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Event not found" }, { status: 404 });
     }
 
-    const updatedEvent = await prismadb.event.update({
+
+    await prismadb.event.update({
       where: { id: id },
       data: data,
     });

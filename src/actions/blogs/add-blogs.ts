@@ -1,7 +1,6 @@
 "use server";
 
 import prismadb from "@/lib/prismadb";
-import { Block } from "@blocknote/core";
 import { UserRole } from "@prisma/client";
 
 type BlogFormValues = {

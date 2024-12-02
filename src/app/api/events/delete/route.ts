@@ -12,7 +12,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Event not found" }, { status: 404 });
     }
 
-    const updatedEvent = await prismadb.event.delete({
+   await prismadb.event.delete({
       where: { id: id },
     });
 
