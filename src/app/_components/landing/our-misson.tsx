@@ -11,8 +11,9 @@ const MissionSection = () => {
   ];
 
   return (
-    <section className="w-full bg-[#D9E6BA]" id="mission">
-      <div className="w-full flex flex-col items-center max-w-screen-2xl mx-auto h-full mt-14 md:mt-20">
+    <section className="w-full bg-[#D9E6BA] relative" id="mission">
+      
+      <div className="w-full flex flex-col items-center mx-auto h-full mt-14 md:mt-20">
         <div className="w-full flex justify-end items-end">
           <div className="flex justify-center w-[35%] md:w-[20%] items-center self-end gap-2 font-semibold text-xs md:text-[18px] cursor-pointer rounded-bl-3xl relative">
             <img
@@ -28,7 +29,7 @@ const MissionSection = () => {
             </div>
           </div>
         </div>
-        <div className="px-5 md:px-14 flex flex-col md:flex-row w-full gap-5">
+        <div className="px-5 md:px-14 flex flex-col md:flex-row w-full gap-5 max-w-screen-2xl">
           <div className="md:w-1/2 w-full flex flex-col justify-center gap-4 lg:gap-10">
             <h1 className="text-3xl leading-[2.8rem] md:leading-[4.3rem] 2xl:leading-[5.3rem] 2xl:text-6xl md:text-5xl font-medium tracking-tight text-green line-clamp-6 mb-3 md:mb-0">
               Our Mission
