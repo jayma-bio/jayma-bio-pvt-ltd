@@ -6,6 +6,8 @@ import {
   Plus,
   Pencil,
   Trash2,
+  Mail,
+  Archive,
   Clock10,
   Check,
 } from "lucide-react";
@@ -146,7 +148,7 @@ const BlogComponent = () => {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
-                          <Link href={`/admin/blogs/edit/${blog.id}`}>
+                          <Link href={`/profile/blogs/edit/${blog.id}`}>
                             <Button variant="outline" size="sm">
                               <Pencil className="w-4 h-4" />
                             </Button>
