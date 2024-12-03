@@ -32,6 +32,7 @@ model User {
   isTwoFactorEnabled    Boolean                @default(false)
   twoFactorConfirmation TwoFactorConfirmation?
   createdAt             DateTime               @default(now())
+  Blog                  Blog[]
 }
 
 model Account {
@@ -125,10 +126,13 @@ model Blog {
   toggle    Boolean  @default(false)
   archived  Boolean  @default(false)
   name      String
-  userName  String
-  userImage String
+  userName  String?
+  userImage String?
   role      UserRole
   likedId   String[]
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

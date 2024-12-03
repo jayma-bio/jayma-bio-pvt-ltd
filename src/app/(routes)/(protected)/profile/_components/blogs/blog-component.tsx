@@ -26,18 +26,7 @@ import { Switch } from "@/components/ui/switch";
 import { getBlogs } from "@/actions/blogs/get-blogs";
 import { deleteBlog } from "@/actions/blogs/delete-blog";
 import { useUserData } from "@/hooks/user-data";
-
-interface Blog {
-  id: string;
-  thumbnail: string;
-  title: string;
-  content: any;
-  likes: number;
-  toggle?: boolean;
-  archived?: boolean;
-  role?: string;
-  userName?: string;
-}
+import { Blog } from "@prisma/client";
 
 const BlogComponent = () => {
   const [blogs, setBlogs] = useState<Blog[]>([]);
@@ -90,7 +79,7 @@ const BlogComponent = () => {
   }, []);
 
   const filteredBlog = blogs.filter(
-    (blog) => blog.role === user?.role && blog.userName === user?.name
+    (blog) => blog.role === user?.role && blog.userId === user?.id
   );
 
   return (
