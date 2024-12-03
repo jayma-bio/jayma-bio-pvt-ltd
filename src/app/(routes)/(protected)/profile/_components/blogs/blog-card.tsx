@@ -105,6 +105,7 @@ const BlogCard: React.FC<BlogCardProps> = ({
               ...data,
               id: initialData?.id,
               content: JSON.stringify(blocks),
+              userId: user?.user?.id,
             }
           : {
               ...data,
@@ -113,6 +114,7 @@ const BlogCard: React.FC<BlogCardProps> = ({
               name: user?.user?.name,
               userName: user?.user?.username,
               userImage: user?.user?.image,
+              userId: user?.user?.id,
               content: JSON.stringify(blocks),
             };
 
@@ -162,7 +164,7 @@ const BlogCard: React.FC<BlogCardProps> = ({
           <FormField
             control={form.control}
             name="thumbnail"
-            render={({ field }) => (
+            render={() => (
               <FormItem>
                 <FormControl>
                   <UploadDropzone
