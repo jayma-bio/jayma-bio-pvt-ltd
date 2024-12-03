@@ -19,7 +19,7 @@ interface BlogCardProps {
   link: string;
   date: string;
   name: string;
-  userName: string;
+  userName: string | null;
   userImage: string;
   likedId: string[];
   className?: string;
@@ -128,7 +128,9 @@ const BlogCard = ({
                 </AvatarFallback>
               </Avatar>
               <p className="font-extralight text-sm">{name}</p>
-              <p className="font-extralight text-sm">@{userName}</p>
+              {userName && (
+                <p className="font-extralight text-sm">@{userName}</p>
+              )}
               <p className="font-extralight text-sm">{formatDate(date, 1)}</p>
             </div>
             <button onClick={handleShare} className="border-none">
