@@ -127,7 +127,7 @@ model Blog {
   archived  Boolean  @default(false)
   name      String
   userName  String?
-  userImage String?
+  userImage String
   role      UserRole
   likedId   String[]
 

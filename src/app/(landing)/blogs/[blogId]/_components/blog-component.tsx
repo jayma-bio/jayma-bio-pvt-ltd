@@ -16,12 +16,12 @@ const BlogComponent = ({ blog }: BlogComponentType) => {
         <div className="flex gap-4">
           <img
             src={blog.userImage}
-            alt={blog.userName}
+            alt={blog.userImage}
             className="w-11 h-11 rounded-full"
           />
           <div className="flex flex-col">
             <p className="text-sm">{blog.name}</p>
-            <p className="text-sm">@{blog.userName}</p>
+            {blog.userName && <p className="text-sm">@{blog.userName}</p>}
           </div>
         </div>
         <p className="text-sm">

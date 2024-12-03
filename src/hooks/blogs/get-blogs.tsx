@@ -13,7 +13,7 @@ interface Blog {
   toggle: boolean;
   archived: boolean;
   name: string;
-  userName: string;
+  userName: string | null;
   userImage: string;
   role: UserRole;
   likedId: string[];
