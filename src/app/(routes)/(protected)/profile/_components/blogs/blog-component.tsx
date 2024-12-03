@@ -89,8 +89,10 @@ const BlogComponent = () => {
     fetchBlogs();
   }, []);
 
-  const filteredBlog = blogs.filter((blog) => blog.role === user?.role);
-  
+  const filteredBlog = blogs.filter(
+    (blog) => blog.role === user?.role && blog.userName === user?.name
+  );
+
   return (
     <>
       <div className="space-y-4">
@@ -111,7 +113,7 @@ const BlogComponent = () => {
                 <TableHead>Thumbnail</TableHead>
                 <TableHead>Title</TableHead>
                 <TableHead className="text-center">Likes</TableHead>
-                <TableHead className="text-center">Archive</TableHead>
+                <TableHead className="text-center">Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
