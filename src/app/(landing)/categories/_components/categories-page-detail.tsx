@@ -17,6 +17,8 @@ interface CategoriesPageDetailsProps {
 const CategoriesPageDetails = ({ categories }: CategoriesPageDetailsProps) => {
   const router = useRouter();
   const [redirecting, setRedirecting] = useState(false);
+
+ 
   return (
     <section
       id="categories"
@@ -53,17 +55,31 @@ const CategoriesPageDetails = ({ categories }: CategoriesPageDetailsProps) => {
                     </p>
                   </div>
                   <div className="flex items-center justify-between">
-                    <Button
+                  {category.name === "SapSymphony" ? (
+                      <Button
                       variant="default"
                       disabled={redirecting}
                       className="bg-green text-white hover:bg-green/90 px-4 rounded-xl"
                       onClick={() => (
                         setRedirecting(true),
-                        router.push(`/categories/${category.id}`)
+                        router.push(`/products/11ZNSYJ369IP31CNBvBH`)
                       )}
                     >
                       View Details
                     </Button>
+                  ) : (
+                    <Button
+                    variant="default"
+                    disabled={redirecting}
+                    className="bg-green text-white hover:bg-green/90 px-4 rounded-xl"
+                    onClick={() => (
+                      setRedirecting(true),
+                      router.push(`/categories/${category.id}`)
+                    )}
+                  >
+                    View Details
+                  </Button>
+                  )}
                   </div>
                 </CardContent>
               </div>
