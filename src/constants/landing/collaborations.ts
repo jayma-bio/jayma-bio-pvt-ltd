@@ -26,7 +26,7 @@ export const collaborators = [
   {
     image: "/landing/collaborators/four.png",
     description:
-      "Drop-in compostable kitchen trash bags from waste tea fungus cellulose.",
+      "Investigation over the Biosorption characteristics of toxic dye & metal removal from aqueous solution by novel biomass.",
     fundingAgency: "Funding Agency - BIRAC",
     timeStamp: "Duration - 18 Months",
     status: "Status - Completed",
@@ -34,7 +34,7 @@ export const collaborators = [
   {
     image: "/landing/collaborators/seven.png",
     description:
-      "Investigation over the Biosorption characteristics of toxic dye & metal removal from aqueous solution by novel biomass.",
+      "Design & Development of Porous Silicon based Biosensor for Chromium detection in & around of Sukind a Mines Valley, Odisha.",
     fundingAgency: "Funding Agency - SERB",
     timeStamp: "Duration - 24 Months",
     status: "Status - Completed",
