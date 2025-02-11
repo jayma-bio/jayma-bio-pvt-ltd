@@ -45,6 +45,10 @@ const formSchema = z.object({
     .min(10, "Phone number must be at least 10 digits")
     .max(10, "Phone number must be at most 10 digits"),
   address: z.string().min(10, "Address must be at least 10 characters"),
+  country: z.string().min(2, "Country must be at least 2 characters"),
+  state: z.string().min(2, "State must be at least 2 characters"),
+  city: z.string().min(2, "City must be at least 2 characters"),
+  pincode: z.string().min(6, "Pincode must be at least 6 characters"),
 });
 
 const CartDetails = ({ userId }: CartDetailsProps) => {
@@ -62,6 +66,10 @@ const CartDetails = ({ userId }: CartDetailsProps) => {
       email: user?.email || "",
       phone: "",
       address: "",
+      country: "",
+      state: "",
+      city: "",
+      pincode: "",
     },
   });
 
@@ -92,12 +100,18 @@ const CartDetails = ({ userId }: CartDetailsProps) => {
   const onCheckOut = async (formData: any) => {
     try {
       setCheckoutLoading(true);
+      // const URL = await getUrl().then((data) => {
+      //   if (data.data) {
+      //     return `${data.data.baseUrl}/${data.data.storeId}`;
+      //   }
+      // });
+
       const URL = await getUrl().then((data) => {
         if (data.data) {
-          return `${data.data.baseUrl}/${data.data.storeId}`;
+          return `${process.env.NEXT_PUBLIC_APP_URL}/${data.data.storeId}`;
         }
       });
-
+      
       const response = await axios.post(`${URL}/checkout`, {
         userId,
         products: cart.items,
@@ -105,9 +119,14 @@ const CartDetails = ({ userId }: CartDetailsProps) => {
         name: formData.name,
         phone: formData.phone,
         email: formData.email,
+        country: formData.country,
+        state: formData.state,
+        city: formData.city,
+        pincode: formData.pincode,
         address: formData.address,
       });
-
+      
+      console.log("Order created successfully:", response.data);
       router.push(response.data.url);
     } catch (error) {
       toast.error("Checkout failed. Please try again.");
@@ -292,6 +311,80 @@ const CartDetails = ({ userId }: CartDetailsProps) => {
                           </FormItem>
                         )}
                       />
+
+                      <div className="flex flex-row justify-between items-center gap-5">
+                        <FormField
+                          control={form.control}
+                          name="country"
+                          render={({ field }) => (
+                            <FormItem className="w-full">
+                              <FormLabel>Country</FormLabel>
+                              <FormControl>
+                                <Input
+                                  className="w-full"
+                                  placeholder="Enter your country"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="state"
+                          render={({ field }) => (
+                            <FormItem className="w-full">
+                              <FormLabel>State</FormLabel>
+                              <FormControl>
+                                <Input
+                                  className="w-full"
+                                  placeholder="Enter your state"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <div className="flex flex-row justify-between items-center gap-5">
+                        <FormField
+                          control={form.control}
+                          name="city"
+                          render={({ field }) => (
+                            <FormItem className="w-full">
+                              <FormLabel>City</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="Enter your city"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="pincode"
+                          render={({ field }) => (
+                            <FormItem className="w-full">
+                              <FormLabel>Pin Code</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="Enter your pin code"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
 
                       <FormField
                         control={form.control}
