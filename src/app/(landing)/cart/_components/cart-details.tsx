@@ -100,12 +100,6 @@ const CartDetails = ({ userId }: CartDetailsProps) => {
   const onCheckOut = async (formData: any) => {
     try {
       setCheckoutLoading(true);
-      // const URL = await getUrl().then((data) => {
-      //   if (data.data) {
-      //     return `${data.data.baseUrl}/${data.data.storeId}`;
-      //   }
-      // });
-
       const URL = await getUrl().then((data) => {
         if (data.data) {
           return `${process.env.NEXT_PUBLIC_APP_URL}/${data.data.storeId}`;

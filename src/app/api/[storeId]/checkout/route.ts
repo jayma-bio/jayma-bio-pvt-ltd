@@ -49,10 +49,10 @@ export async function POST(
   req: NextRequest,
   { params }: { params: { storeId: string } }
 ) {
-  // Cashfree.XClientId = process.env.NEXT_PUBLIC_CASHFREE_APP_ID as string;
-  // Cashfree.XClientSecret = process.env.NEXT_PUBLIC_CASHFREE_SECRET_KEY as string;
-  // Cashfree.XEnvironment = Cashfree.Environment.PRODUCTION;
-
+  Cashfree.XClientId = process.env.NEXT_PUBLIC_CASHFREE_APP_ID as string;
+  Cashfree.XClientSecret = process.env.NEXT_PUBLIC_CASHFREE_SECRET_KEY as string;
+  Cashfree.XEnvironment = Cashfree.Environment.PRODUCTION;
+  
   try {
     const { products, userId, paymentPrice, name, email, phone,
       country,
@@ -134,13 +134,30 @@ export async function POST(
       "weight": "1"
     };
 
-    const createShipRocketOrder = await axiosinstance.post("/orders/create/adhoc", shipRocketOrderData).then((response) => {
-      console.log("Order created successfully:", response.data);
-      return response.data;
+    const token = await axiosinstance.post("/auth/login", {
+      email: process.env.SHIPROCKET_EMAIL,
+      password: process.env.SHIPROCKET_PASSWORD,
+    }).then((response) => {
+      console.log("Logged in successfully:", response.data);
+      return response.data.token;
     }).catch((error) => {
       console.error("Error:", error.response.data.message);
       return null;
-    });
+    })
+
+    const createShipRocketOrder = await axiosinstance.post("/orders/create/adhoc", shipRocketOrderData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        }
+      }).then((response) => {
+        console.log("Order created successfully:", response.data);
+        return response.data;
+      }).catch((error) => {
+        console.error("Error:", error.response.data.message);
+        return null;
+      });
 
     if (!createShipRocketOrder) {
       return NextResponse.json(
@@ -149,38 +166,14 @@ export async function POST(
       );
     }
 
+    console.log("Created ShipRocket Order:", createShipRocketOrder);
+
     await updateDoc(doc(db, "stores", params.storeId, "orders", id), {
       ...orderData,
       id,
       shiprocket_id: createShipRocketOrder.shipment_id,
       updatedAt,
     });
-
-    const generatedAWB = await axiosinstance.post("/courier/assign/awb", {
-      shipment_id: createShipRocketOrder.shipment_id,
-    }).then((response) => {
-      console.log("AWB generated successfully:", response.data);
-      return response.data;
-    }).catch((error) => {
-      console.error("Error:", error.response.data.message);
-      return null;
-    });
-
-    if (!generatedAWB) {
-      return NextResponse.json(
-        { error: "Failed to generate AWB" },
-        { status: 500, headers: corsHeaders }
-      );
-    }
-
-    await updateDoc(doc(db, "stores", params.storeId, "orders", id), {
-      ...orderData,
-      id,
-      awb_id: generatedAWB.response.data.awb_code,
-      updatedAt,
-    });
-
-    // return NextResponse.json({ generatedAWB }, { headers: corsHeaders });
 
     const payload = {
       customer_details: {
@@ -203,7 +196,7 @@ export async function POST(
         return response.data;
       })
       .catch((error: any) => {
-        console.error("Error:", error.response.data.message);
+        console.error("Error Cashfree:", error.response.data.message);
         return null;
       });
 
