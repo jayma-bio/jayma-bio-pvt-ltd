@@ -3,7 +3,7 @@ export const LatestProductsDetails = [
         name:"Sap Symphony",
         desc:"We create eco-friendly technology that transforms plant signals into music and data, making plant monitoring accessible for everyone. Our solutions foster a deeper connection with nature while supporting sustainable practices.",
         imageUrl:"/landing/latest-products/sap-symphony.svg",
-        url:"/categories/AT9BZUp367C568DKwt1Q",
+        url:"https://sapsymphony.in",
     },
     {
         name:"BrewBucha",
