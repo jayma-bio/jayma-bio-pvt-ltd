@@ -217,7 +217,7 @@ export async function POST(
     paymentUrl.searchParams.append("session_id", data.payment_session_id!);
     paymentUrl.searchParams.append("store_id", params.storeId);
     paymentUrl.searchParams.append("order_id", id);
-
+    
     return NextResponse.json(
       { url: paymentUrl.toString() },
       { headers: corsHeaders }
