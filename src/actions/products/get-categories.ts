@@ -8,7 +8,7 @@ const getCategories = async (): Promise<Category[]> => {
         return `${data.data.baseUrl}/${data.data.storeId}/categories`;
       }
     });
-
+    
     if (!URL) {
       throw new Error("URL is undefined");
     }
