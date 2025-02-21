@@ -28,7 +28,7 @@ export async function POST(
 ) {
   try {
     const { orderId, paymentId, status } = await req.json();
-
+    
     const order = (
       await getDoc(doc(db, "stores", params.storeId, "orders", orderId))
     ).data() as Order;
