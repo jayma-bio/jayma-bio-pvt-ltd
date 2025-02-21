@@ -30,6 +30,9 @@ export const publicRoutes = [
   "/api/events/getAll",
   "/api/events/update",
   "/api/events/delete",
+  "/api/webhook",
+  "/api/:id/checkout",
+  "/api/:id/status",
 ];
 
 /**
