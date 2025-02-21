@@ -8,8 +8,9 @@ import {
 } from "firebase/firestore";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { Cashfree, OrderEntity } from "cashfree-pg";
+import { Cashfree } from "cashfree-pg";
 import { axiosinstance } from "@/lib/axios";
+import { EventEmitter } from "node:stream";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -18,7 +19,7 @@ const corsHeaders = {
   "Access-Control-Max-Age": "86400",
 };
 
-export async function OPTIONS(req: NextRequest) {
+export async function OPTIONS() {
   return new NextResponse(null, {
     status: 204,
     headers: {
@@ -45,6 +46,9 @@ async function getFormattedServerTimestamp(date: Date) {
   return formatDate(date);
 }
 
+const emitter = new EventEmitter()
+emitter.setMaxListeners(0)
+
 export async function POST(
   req: NextRequest,
   { params }: { params: { storeId: string } }
@@ -52,7 +56,7 @@ export async function POST(
   Cashfree.XClientId = process.env.NEXT_PUBLIC_CASHFREE_APP_ID as string;
   Cashfree.XClientSecret = process.env.NEXT_PUBLIC_CASHFREE_SECRET_KEY as string;
   Cashfree.XEnvironment = Cashfree.Environment.PRODUCTION;
-  
+
   try {
     const { products, userId, paymentPrice, name, email, phone,
       country,
@@ -217,7 +221,7 @@ export async function POST(
     paymentUrl.searchParams.append("session_id", data.payment_session_id!);
     paymentUrl.searchParams.append("store_id", params.storeId);
     paymentUrl.searchParams.append("order_id", id);
-    
+
     return NextResponse.json(
       { url: paymentUrl.toString() },
       { headers: corsHeaders }
