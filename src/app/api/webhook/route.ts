@@ -7,6 +7,7 @@ import {
 import { Order } from "@/types-db";
 import { addDoc, collection, doc, getDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { NextResponse } from "next/server";
+import { EventEmitter } from "node:stream";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -17,6 +18,9 @@ const corsHeaders = {
 export const OPTIONS = async () => {
   return NextResponse.json({}, { headers: corsHeaders });
 };
+
+const emitter = new EventEmitter()
+emitter.setMaxListeners(0)
 
 export async function POST(
   req: Request,
