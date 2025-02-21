@@ -42,19 +42,22 @@ const Page = () => {
   }, [router]);
 
   const handleWebhook = async () => {
+    const URL = await getUrl().then((data) => {
+      if (data.data) {
+        return `${process.env.NEXT_PUBLIC_APP_URL}/${data.data.storeId}`;
+      }
+    });
+
     if (!orderData.orderId || !orderData.paymentId || !orderData.status) {
       return;
     }
 
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_APP_URL}/webhook`,
-        {
-          orderId: orderData.orderId,
-          paymentId: orderData.paymentId,
-          status: orderData.status,
-        }
-      );
+      const response = await axios.post(`${URL}/webhook`, {
+        orderId: orderData.orderId,
+        paymentId: orderData.paymentId,
+        status: orderData.status,
+      });
 
       if (response.data.status === 200) {
         // sendSuccessMail();
