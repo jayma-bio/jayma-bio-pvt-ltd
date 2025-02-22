@@ -4,7 +4,10 @@ import { getUrl } from "@/actions/get-url";
 import { MaxWrapper } from "@/components/shared/max-wrapper";
 import { Button } from "@/components/ui/button";
 import useCart from "@/hooks/products/use-carts";
+import { db } from "@/lib/firebase";
+import { Order } from "@/types-db";
 import axios from "axios";
+import { doc, getDoc } from "firebase/firestore";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -42,6 +45,11 @@ const Page = () => {
   }, [router]);
 
   const handleWebhook = async () => {
+    const storeId = await getUrl().then((data) => {
+      if (data.data) {
+        return data.data.storeId;
+      }
+    });
     const URL = await getUrl().then((data) => {
       if (data.data) {
         return `${process.env.NEXT_PUBLIC_APP_URL}/${data.data.storeId}`;
@@ -52,11 +60,21 @@ const Page = () => {
       return;
     }
 
+    if (!storeId) {
+      console.error("Store ID is undefined");
+      return;
+    }
+
+    const order = (
+      await getDoc(doc(db, "stores", storeId, "orders", orderData.orderId))
+    ).data() as Order;
+    
     try {
       const response = await axios.post(`${URL}/webhook`, {
         orderId: orderData.orderId,
         paymentId: orderData.paymentId,
         status: orderData.status,
+        order: order
       });
 
       if (response.data.status === 200) {
