@@ -63,7 +63,7 @@ export async function POST(
       country,
       state,
       city,
-      pincode, address } =
+      pincode, address, token } =
       await req.json();
 
     // Validate required fields
@@ -75,7 +75,7 @@ export async function POST(
     }
 
     const createdAt = serverTimestamp();
-    
+
     const orderData = {
       isPaid: false,
       userId: userId,
@@ -132,23 +132,6 @@ export async function POST(
       "weight": "1"
     };
 
-    const token = await axiosinstance.post("/auth/login", {
-      email: process.env.SHIPROCKET_EMAIL,
-      password: process.env.SHIPROCKET_PASSWORD,
-    }).then((response) => {
-      console.log("Logged in successfully:", response.data);
-
-      return response.data.token;
-    }).catch((error) => {
-      console.error("Error:", error.response.data.message);
-      return null;
-    })
-    
-    const cookie = await cookies();
-    cookie.set("token", token, {
-      path: '/'
-    })
-    
     const createShipRocketOrder = await axiosinstance.post("/orders/create/adhoc", shipRocketOrderData,
       {
         headers: {
@@ -169,9 +152,9 @@ export async function POST(
         { status: 500, headers: corsHeaders }
       );
     }
-    
+
     console.log("Created ShipRocket Order:", createShipRocketOrder);
-    
+
     return NextResponse.json({ id: id, shipment_id: createShipRocketOrder.shipment_id, orderData: orderData })
   } catch (error) {
     console.error("Error processing request:", error);
