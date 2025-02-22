@@ -105,7 +105,7 @@ const CartDetails = ({ userId }: CartDetailsProps) => {
           return `${process.env.NEXT_PUBLIC_APP_URL}/${data.data.storeId}`;
         }
       });
-      
+
       const response = await axios.post(`${URL}/checkout`, {
         userId,
         products: cart.items,
@@ -119,9 +119,18 @@ const CartDetails = ({ userId }: CartDetailsProps) => {
         pincode: formData.pincode,
         address: formData.address,
       });
-      
-      console.log("Order created successfully:", response.data);
-      router.push(response.data.url);
+
+      const res = await axios.post(`${URL}/payment`, {
+        userId,
+        phone: formData.phone,
+        email: formData.email,
+        name: formData.name,
+        paymentPrice: finalPrice.toFixed(2),
+        id: response.data.id,
+        shipment_id: response.data.shipment_id,
+        orderData: response.data.orderData,
+      });
+      router.push(res.data.url);
     } catch (error) {
       toast.error("Checkout failed. Please try again.");
       router.replace("/checkout-failed");

@@ -5,7 +5,7 @@ import {
   sendOrderPlacedMailtoUser,
 } from "@/lib/mail";
 import { Order } from "@/types-db";
-import { addDoc, collection, doc, getDoc, serverTimestamp, updateDoc } from "firebase/firestore";
+import { doc, getDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { NextResponse } from "next/server";
 import { EventEmitter } from "node:stream";
 
@@ -34,17 +34,6 @@ export async function POST(
     ).data() as Order;
 
     if (status === "success" || status === "SUCCESS") {
-      const token = await axiosinstance.post("/auth/login", {
-        email: process.env.SHIPROCKET_EMAIL,
-        password: process.env.SHIPROCKET_PASSWORD,
-      }).then((response) => {
-        console.log("Logged in successfully:", response.data);
-        return response.data.token;
-      }).catch((error) => {
-        console.error("Error:", error.response.data.message);
-        return null;
-      });
-
       const items_name = order.orderItems.map((item) => item.name).join(", ");
       const info1 = await sendOrderPlacedMailtoUser({
         name: order.name,
@@ -56,32 +45,7 @@ export async function POST(
         paymentId: order.paymentId,
         storeId: params.storeId,
       });
-
-      const generatedAWB = await axiosinstance.post("/courier/assign/awb", {
-        shipment_id: order.shipment_id,
-      },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-          }
-        }).then((response) => {
-          console.log("AWB generated successfully:", response.data);
-          return response.data;
-        }).catch((error) => {
-          console.error("Error:", error.response.data.message);
-          return null;
-        });
-
-      if (!generatedAWB) {
-        return NextResponse.json(
-          { error: "Failed to generate AWB" },
-          { status: 500, headers: corsHeaders }
-        );
-      }
-
-      console.log("Generated AWB:", generatedAWB);
-
+      
       await sendOrderPlacedMailtoAdmin({
         name: order.name,
         orderId: order.id,
@@ -97,7 +61,6 @@ export async function POST(
         paymentId: paymentId,
         order_status: "Payment Successful",
         sent_email: info1.messageId ? true : false,
-        awb_id: generatedAWB.response.data.awb_code,
         updatedAt: serverTimestamp(),
       });
     } else {

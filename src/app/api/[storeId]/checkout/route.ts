@@ -11,6 +11,7 @@ import type { NextRequest } from "next/server";
 import { Cashfree } from "cashfree-pg";
 import { axiosinstance } from "@/lib/axios";
 import { EventEmitter } from "node:stream";
+import { cookies, headers } from "next/headers";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -56,7 +57,7 @@ export async function POST(
   Cashfree.XClientId = process.env.NEXT_PUBLIC_CASHFREE_APP_ID as string;
   Cashfree.XClientSecret = process.env.NEXT_PUBLIC_CASHFREE_SECRET_KEY as string;
   Cashfree.XEnvironment = Cashfree.Environment.PRODUCTION;
-  
+
   try {
     const { products, userId, paymentPrice, name, email, phone,
       country,
@@ -74,8 +75,7 @@ export async function POST(
     }
 
     const createdAt = serverTimestamp();
-    const updatedAt = serverTimestamp();
-
+    
     const orderData = {
       isPaid: false,
       userId: userId,
@@ -99,12 +99,6 @@ export async function POST(
     );
 
     const id = orderRef.id;
-
-    await updateDoc(doc(db, "stores", params.storeId, "orders", id), {
-      ...orderData,
-      id,
-      updatedAt,
-    });
 
     const shipRocketOrderData = {
       "order_id": id,
@@ -143,12 +137,18 @@ export async function POST(
       password: process.env.SHIPROCKET_PASSWORD,
     }).then((response) => {
       console.log("Logged in successfully:", response.data);
+
       return response.data.token;
     }).catch((error) => {
       console.error("Error:", error.response.data.message);
       return null;
     })
-
+    
+    const cookie = await cookies();
+    cookie.set("token", token, {
+      path: '/'
+    })
+    
     const createShipRocketOrder = await axiosinstance.post("/orders/create/adhoc", shipRocketOrderData,
       {
         headers: {
@@ -169,63 +169,10 @@ export async function POST(
         { status: 500, headers: corsHeaders }
       );
     }
-
+    
     console.log("Created ShipRocket Order:", createShipRocketOrder);
-
-    await updateDoc(doc(db, "stores", params.storeId, "orders", id), {
-      ...orderData,
-      id,
-      shiprocket_id: createShipRocketOrder.shipment_id,
-      updatedAt,
-    });
-
-    const payload = {
-      customer_details: {
-        customer_id: userId,
-        customer_phone: phone,
-        customer_email: email,
-        customer_name: name,
-      },
-      order_meta: {
-        return_url: process.env.FRONTEND_URL! + `?orderId=/${id}`,
-      },
-      order_id: id,
-      order_amount: paymentPrice,
-      order_currency: "INR",
-    };
-
-    const data = await Cashfree.PGCreateOrder("2023-08-01", payload)
-      .then((response: { data: any }) => {
-        console.log("Order created successfully:", response.data);
-        return response.data;
-      })
-      .catch((error: any) => {
-        console.error("Error Cashfree:", error.response.data.message);
-        return null;
-      });
-
-    if (!data) {
-      return NextResponse.json(
-        { error: "Failed to create order" },
-        { status: 500, headers: corsHeaders }
-      );
-    }
-
-    await updateDoc(doc(db, "stores", params.storeId, "orders", id), {
-      ...orderData,
-      id,
-      session_id: data.payment_session_id,
-    });
-
-    const paymentUrl = new URL(process.env.PAYMENT_URL! || "");
-    paymentUrl.searchParams.append("session_id", data.payment_session_id!);
-    paymentUrl.searchParams.append("store_id", params.storeId);
-    paymentUrl.searchParams.append("order_id", id);
-
-    return NextResponse.json(
-      { url: paymentUrl.toString() },
-      { headers: corsHeaders }
-    );
+    
+    return NextResponse.json({ id: id, shipment_id: createShipRocketOrder.shipment_id, orderData: orderData })
   } catch (error) {
     console.error("Error processing request:", error);
     return new NextResponse(JSON.stringify({
