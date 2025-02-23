@@ -5,7 +5,13 @@ import {
   sendOrderPlacedMailtoUser,
 } from "@/lib/mail";
 import { Order } from "@/types-db";
-import { doc, getDoc, serverTimestamp, updateDoc } from "firebase/firestore";
+import { FirebaseError } from "firebase/app";
+import {
+  doc,
+  getDoc,
+  serverTimestamp,
+  updateDoc
+} from "firebase/firestore";
 import { NextResponse } from "next/server";
 import { EventEmitter } from "node:stream";
 
@@ -19,8 +25,27 @@ export const OPTIONS = async () => {
   return NextResponse.json({}, { headers: corsHeaders });
 };
 
-const emitter = new EventEmitter()
-emitter.setMaxListeners(0)
+const emitter = new EventEmitter();
+emitter.setMaxListeners(0);
+
+// Retry function for Firebase operations
+const retryOperation = async (operation: () => Promise<any>, maxAttempts = 3, delay = 1000) => {
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      return await operation();
+    } catch (error) {
+      if (
+        error instanceof FirebaseError &&
+        error.code === 'unavailable' &&
+        attempt < maxAttempts
+      ) {
+        await new Promise(resolve => setTimeout(resolve, delay * attempt));
+        continue;
+      }
+      throw error;
+    }
+  }
+};
 
 export async function POST(
   req: Request,
@@ -28,46 +53,76 @@ export async function POST(
 ) {
   try {
     const { orderId, paymentId, status } = await req.json();
-    
-    const order = (
+
+    // Get order with retry
+    const orderDoc = await retryOperation(async () =>
       await getDoc(doc(db, "stores", params.storeId, "orders", orderId))
-    ).data() as Order;
+    );
+
+    if (!orderDoc.exists()) {
+      return NextResponse.json(
+        { error: "Order not found" },
+        { status: 404, headers: corsHeaders }
+      );
+    }
+
+    const order = orderDoc.data() as Order;
 
     if (status === "success" || status === "SUCCESS") {
       const items_name = order.orderItems.map((item) => item.name).join(", ");
-      const info1 = await sendOrderPlacedMailtoUser({
-        name: order.name,
-        email: order.email,
-        orderId: order.id,
-        amount: order.amount.toString(),
-        date: order.createdAt.toDate().toISOString(),
-        items_name: items_name,
-        paymentId: order.paymentId,
-        storeId: params.storeId,
-      });
-      
-      await sendOrderPlacedMailtoAdmin({
-        name: order.name,
-        orderId: order.id,
-        amount: order.amount.toString(),
-        date: order.createdAt.toDate().toISOString(),
-        items_name: items_name,
-        paymentId: order.paymentId,
-        storeId: params.storeId,
-      });
 
-      await updateDoc(doc(db, "stores", params.storeId, "orders", orderId), {
-        isPaid: true,
-        paymentId: paymentId,
-        order_status: "Payment Successful",
-        sent_email: info1.messageId ? true : false,
-        updatedAt: serverTimestamp(),
-      });
+      // Send emails
+      const emailPromises = [];
+      try {
+        emailPromises.push(
+          sendOrderPlacedMailtoUser({
+            name: order.name,
+            email: order.email,
+            orderId: order.id,
+            amount: order.amount.toString(),
+            date: order.createdAt.toDate().toISOString(),
+            items_name: items_name,
+            paymentId: order.paymentId,
+            storeId: params.storeId,
+          })
+        );
+
+        emailPromises.push(
+          sendOrderPlacedMailtoAdmin({
+            name: order.name,
+            orderId: order.id,
+            amount: order.amount.toString(),
+            date: order.createdAt.toDate().toISOString(),
+            items_name: items_name,
+            paymentId: order.paymentId,
+            storeId: params.storeId,
+          })
+        );
+      } catch (emailError) {
+        console.error("Email sending failed:", emailError);
+        // Continue execution even if email fails
+      }
+
+      const [userEmailInfo] = await Promise.allSettled(emailPromises);
+
+      // Update order with retry
+      await retryOperation(async () =>
+        await updateDoc(doc(db, "stores", params.storeId, "orders", orderId), {
+          isPaid: true,
+          paymentId: paymentId,
+          order_status: "Payment Successful",
+          sent_email: userEmailInfo.status === 'fulfilled' && userEmailInfo.value?.messageId ? true : false,
+          updatedAt: serverTimestamp(),
+        })
+      );
     } else {
-      await updateDoc(doc(db, "stores", params.storeId, "orders", orderId), {
-        order_status: "Payment Failed",
-        updatedAt: serverTimestamp(),
-      });
+      // Update failed payment status with retry
+      await retryOperation(async () =>
+        await updateDoc(doc(db, "stores", params.storeId, "orders", orderId), {
+          order_status: "Payment Failed",
+          updatedAt: serverTimestamp(),
+        })
+      );
     }
 
     return NextResponse.json(
@@ -75,8 +130,16 @@ export async function POST(
       { headers: corsHeaders }
     );
   } catch (error) {
-    console.error(error);
+    console.error("Webhook error:", error);
 
-    return NextResponse.json({ error: error }, { headers: corsHeaders });
+    const errorResponse = {
+      message: "Internal server error",
+      error: error instanceof FirebaseError ? error : 'unknown',
+    };
+
+    return NextResponse.json(
+      errorResponse,
+      { status: 500, headers: corsHeaders }
+    );
   }
 }
