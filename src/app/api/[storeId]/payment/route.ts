@@ -9,7 +9,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { Cashfree } from "cashfree-pg";
 
-export const retryOperation = async (
+const retryOperation = async (
     operation: () => Promise<any>,
     maxAttempts = 3,
     delay = 1000
