@@ -133,7 +133,8 @@ export async function POST(
       city,
       pincode,
       address,
-      token
+      token,
+      orderId: id
     } = await req.json();
 
     // Validate required fields
@@ -143,7 +144,7 @@ export async function POST(
         { status: 400, headers: corsHeaders }
       );
     }
-
+    
     // Create order document
     const orderData: OrderData = {
       isPaid: false,
@@ -162,17 +163,7 @@ export async function POST(
       createdAt: serverTimestamp(),
       processingStarted: true,
     };
-
-    // Create Firebase document with retry
-    const orderRef = await retryOperation(async () => {
-      return await addDoc(
-        collection(db, "stores", params.storeId, "orders"),
-        orderData
-      );
-    });
-
-    const id = orderRef.id;
-
+    
     // Prepare Shiprocket order data
     const shipRocketOrderData: ShipRocketOrderData = {
       order_id: id,
