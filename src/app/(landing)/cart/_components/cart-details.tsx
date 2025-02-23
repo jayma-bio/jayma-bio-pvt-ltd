@@ -102,32 +102,38 @@ const CartDetails = ({ userId }: CartDetailsProps) => {
       setCheckoutLoading(true);
       const URL = await getUrl().then((data) => {
         if (data.data) {
-          return `${process.env.NEXT_PUBLIC_APP_URL}/${data.data.storeId}`;
+          return {
+            app: `${process.env.NEXT_PUBLIC_APP_URL}/${data.data.storeId}`,
+            payment: `${process.env.NEXT_PUBLIC_ECOMMERCE_URL}/api/${data.data.storeId}`,
+          };
         }
       });
 
       const accessToken = await axios.get(`/api/shiprocket`);
-      
+
       if (!accessToken.data.token) {
         toast.error("Shiprocket authentication error. Please try again.");
         return;
       }
 
-      const addFirebase = await axios.post(`${URL}/addfirebase`, {
-        userId,
-        products: cart.items,
-        paymentPrice: finalPrice.toFixed(2),
-        name: formData.name,
-        phone: formData.phone,
-        email: formData.email,
-        country: formData.country,
-        state: formData.state,
-        city: formData.city,
-        pincode: formData.pincode,
-        address: formData.address,
-      });
+      const addFirebase = await axios.post(
+        `${URL?.payment}/checkout`,
+        {
+          userId,
+          products: cart.items,
+          paymentPrice: finalPrice.toFixed(2),
+          name: formData.name,
+          phone: formData.phone,
+          email: formData.email,
+          country: formData.country,
+          state: formData.state,
+          city: formData.city,
+          pincode: formData.pincode,
+          address: formData.address,
+        }
+      );
 
-      const res1 = await axios.post(`${URL}/checkout`, {
+      const res1 = await axios.post(`${URL?.app}/checkout`, {
         userId,
         products: cart.items,
         paymentPrice: finalPrice.toFixed(2),
@@ -143,7 +149,7 @@ const CartDetails = ({ userId }: CartDetailsProps) => {
         orderId: addFirebase.data.id,
       });
 
-      const res2 = await axios.post(`${URL}/payment`, {
+      const res2 = await axios.post(`${URL?.app}/payment`, {
         userId,
         phone: formData.phone,
         email: formData.email,

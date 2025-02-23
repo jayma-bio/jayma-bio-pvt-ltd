@@ -47,7 +47,7 @@ const Page = () => {
   const handleWebhook = async () => {
     const URL = await getUrl().then((data) => {
       if (data.data) {
-        return `${process.env.NEXT_PUBLIC_APP_URL}/${data.data.storeId}`;
+        return `${process.env.NEXT_PUBLIC_ECOMMERCE_URL}/api/${data.data.storeId}`;
       }
     });
 
@@ -63,7 +63,6 @@ const Page = () => {
       });
       
       if (response.data.status === 200) {
-        // sendSuccessMail();
         localStorage.removeItem("url");
         cart.removeAllAfterPurchase();
       }
