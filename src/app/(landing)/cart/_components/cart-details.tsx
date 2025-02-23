@@ -106,8 +106,8 @@ const CartDetails = ({ userId }: CartDetailsProps) => {
         }
       });
 
-      const accessToken = await axios.get(`/shiprocket`);
-
+      const accessToken = await axios.get(`/api/shiprocket`);
+      
       if (!accessToken.data.token) {
         toast.error("Shiprocket authentication error. Please try again.");
         return;
