@@ -113,6 +113,20 @@ const CartDetails = ({ userId }: CartDetailsProps) => {
         return;
       }
 
+      const addFirebase = await axios.post(`${URL}/addfirebase`, {
+        userId,
+        products: cart.items,
+        paymentPrice: finalPrice.toFixed(2),
+        name: formData.name,
+        phone: formData.phone,
+        email: formData.email,
+        country: formData.country,
+        state: formData.state,
+        city: formData.city,
+        pincode: formData.pincode,
+        address: formData.address,
+      });
+
       const res1 = await axios.post(`${URL}/checkout`, {
         userId,
         products: cart.items,
@@ -126,6 +140,7 @@ const CartDetails = ({ userId }: CartDetailsProps) => {
         pincode: formData.pincode,
         address: formData.address,
         token: accessToken.data.token,
+        orderId: addFirebase.data.id,
       });
 
       const res2 = await axios.post(`${URL}/payment`, {
