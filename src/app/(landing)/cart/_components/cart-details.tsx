@@ -106,7 +106,14 @@ const CartDetails = ({ userId }: CartDetailsProps) => {
         }
       });
 
-      const response = await axios.post(`${URL}/checkout`, {
+      const accessToken = await axios.get(`/shiprocket`);
+
+      if (!accessToken.data.token) {
+        toast.error("Shiprocket authentication error. Please try again.");
+        return;
+      }
+
+      const res1 = await axios.post(`${URL}/checkout`, {
         userId,
         products: cart.items,
         paymentPrice: finalPrice.toFixed(2),
@@ -118,19 +125,20 @@ const CartDetails = ({ userId }: CartDetailsProps) => {
         city: formData.city,
         pincode: formData.pincode,
         address: formData.address,
+        token: accessToken.data.token,
       });
 
-      const res = await axios.post(`${URL}/payment`, {
+      const res2 = await axios.post(`${URL}/payment`, {
         userId,
         phone: formData.phone,
         email: formData.email,
         name: formData.name,
         paymentPrice: finalPrice.toFixed(2),
-        id: response.data.id,
-        shipment_id: response.data.shipment_id,
-        orderData: response.data.orderData,
+        id: res1.data.id,
+        shipment_id: res1.data.shipment_id,
+        orderData: res1.data.orderData,
       });
-      router.push(res.data.url);
+      router.push(res2.data.url);
     } catch (error) {
       toast.error("Checkout failed. Please try again.");
       router.replace("/checkout-failed");
