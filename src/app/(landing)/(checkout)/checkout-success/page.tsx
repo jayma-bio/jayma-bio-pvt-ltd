@@ -45,11 +45,6 @@ const Page = () => {
   }, [router]);
 
   const handleWebhook = async () => {
-    const storeId = await getUrl().then((data) => {
-      if (data.data) {
-        return data.data.storeId;
-      }
-    });
     const URL = await getUrl().then((data) => {
       if (data.data) {
         return `${process.env.NEXT_PUBLIC_APP_URL}/${data.data.storeId}`;
@@ -59,24 +54,14 @@ const Page = () => {
     if (!orderData.orderId || !orderData.paymentId || !orderData.status) {
       return;
     }
-
-    if (!storeId) {
-      console.error("Store ID is undefined");
-      return;
-    }
-
-    const order = (
-      await getDoc(doc(db, "stores", storeId, "orders", orderData.orderId))
-    ).data() as Order;
     
     try {
       const response = await axios.post(`${URL}/webhook`, {
         orderId: orderData.orderId,
         paymentId: orderData.paymentId,
         status: orderData.status,
-        order: order
       });
-
+      
       if (response.data.status === 200) {
         // sendSuccessMail();
         localStorage.removeItem("url");
