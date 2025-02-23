@@ -84,8 +84,7 @@ const corsHeaders = {
 const emitter = new EventEmitter();
 emitter.setMaxListeners(0);
 
-// Utility functions
-export const retryOperation = async (
+const retryOperation = async (
   operation: () => Promise<any>,
   maxAttempts = 3,
   delay = 1000
