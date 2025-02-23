@@ -1,4 +1,3 @@
-import { FirebaseError } from "firebase/app";
 import { db } from "@/lib/firebase";
 import {
     doc,
@@ -8,28 +7,6 @@ import {
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { Cashfree } from "cashfree-pg";
-
-const retryOperation = async (
-    operation: () => Promise<any>,
-    maxAttempts = 3,
-    delay = 1000
-) => {
-    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-        try {
-            return await operation();
-        } catch (error) {
-            if (
-                error instanceof FirebaseError &&
-                (error.code === 'unavailable' || error.code === 'resource-exhausted') &&
-                attempt < maxAttempts
-            ) {
-                await new Promise(resolve => setTimeout(resolve, delay * attempt));
-                continue;
-            }
-            throw error;
-        }
-    }
-};
 
 export async function POST(
     req: NextRequest,
@@ -93,18 +70,13 @@ export async function POST(
             );
         }
 
-        // Update Firebase with retry mechanism
-        await retryOperation(async () => {
-            const docRef = doc(db, "stores", params.storeId, "orders", id);
-            await updateDoc(docRef, {
-                ...orderData,
-                id,
-                session_id: data.payment_session_id,
-                shiprocket_id: shipment_id,
-                updatedAt: serverTimestamp(),
-                status: 'created', // Add status to track document state
-                createdAt: serverTimestamp(), // Add creation timestamp
-            });
+        const docRef = doc(db, "stores", params.storeId, "orders", id);
+        await updateDoc(docRef, {
+            ...orderData,
+            id,
+            session_id: data.payment_session_id,
+            shiprocket_id: shipment_id,
+            updatedAt: serverTimestamp(),
         });
 
         const paymentUrl = new URL(process.env.PAYMENT_URL! || "");
