@@ -1,7 +1,6 @@
+import { FirebaseError } from "firebase/app";
 import { db } from "@/lib/firebase";
 import {
-    addDoc,
-    collection,
     doc,
     serverTimestamp,
     updateDoc,
@@ -9,6 +8,28 @@ import {
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { Cashfree } from "cashfree-pg";
+
+export const retryOperation = async (
+    operation: () => Promise<any>,
+    maxAttempts = 3,
+    delay = 1000
+) => {
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        try {
+            return await operation();
+        } catch (error) {
+            if (
+                error instanceof FirebaseError &&
+                (error.code === 'unavailable' || error.code === 'resource-exhausted') &&
+                attempt < maxAttempts
+            ) {
+                await new Promise(resolve => setTimeout(resolve, delay * attempt));
+                continue;
+            }
+            throw error;
+        }
+    }
+};
 
 export async function POST(
     req: NextRequest,
@@ -21,8 +42,9 @@ export async function POST(
     try {
         const { userId, phone, email, name, paymentPrice, id, shipment_id, orderData } = await req.json();
 
+        // Input validation
         if (!userId || !phone || !email || !name || !paymentPrice || !id || !shipment_id || !orderData) {
-            console.log({
+            console.log("Missing required fields:", {
                 userId,
                 phone,
                 email,
@@ -33,11 +55,12 @@ export async function POST(
                 orderData
             });
             return NextResponse.json(
-                { error: "Invalid request" },
+                { error: "Missing required fields" },
                 { status: 400 }
             );
         }
 
+        // Create Cashfree order
         const payload = {
             customer_details: {
                 customer_id: userId,
@@ -59,23 +82,29 @@ export async function POST(
                 return response.data;
             })
             .catch((error: any) => {
-                console.error("Error Cashfree:", error.response.data.message);
+                console.error("Cashfree Error:", error.response?.data?.message || error.message);
                 return null;
             });
 
         if (!data) {
             return NextResponse.json(
-                { error: "Failed to create order" },
+                { error: "Failed to create payment order" },
                 { status: 500 }
             );
         }
 
-        await updateDoc(doc(db, "stores", params.storeId, "orders", id), {
-            ...orderData,
-            id,
-            session_id: data.payment_session_id,
-            shiprocket_id: shipment_id,
-            updatedAt: serverTimestamp(),
+        // Update Firebase with retry mechanism
+        await retryOperation(async () => {
+            const docRef = doc(db, "stores", params.storeId, "orders", id);
+            await updateDoc(docRef, {
+                ...orderData,
+                id,
+                session_id: data.payment_session_id,
+                shiprocket_id: shipment_id,
+                updatedAt: serverTimestamp(),
+                status: 'created', // Add status to track document state
+                createdAt: serverTimestamp(), // Add creation timestamp
+            });
         });
 
         const paymentUrl = new URL(process.env.PAYMENT_URL! || "");
@@ -83,13 +112,17 @@ export async function POST(
         paymentUrl.searchParams.append("store_id", params.storeId);
         paymentUrl.searchParams.append("order_id", id);
 
-        return NextResponse.json({ url: paymentUrl.toString() });
+        return NextResponse.json({
+            url: paymentUrl.toString(),
+            orderId: id,
+            session_id: data.payment_session_id
+        });
     } catch (error) {
         console.error("Error processing request:", error);
-        return new NextResponse(JSON.stringify({
+        return NextResponse.json({
             error: "Internal Server Error",
-            details: (error as Error).message
-        }), {
+            details: error instanceof Error ? error.message : "Unknown error"
+        }, {
             status: 500,
             headers: {
                 "Content-Type": "application/json",
