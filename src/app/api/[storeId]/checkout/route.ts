@@ -144,7 +144,7 @@ export async function POST(
         { status: 400, headers: corsHeaders }
       );
     }
-    
+
     // Create order document
     const orderData: OrderData = {
       isPaid: false,
@@ -164,7 +164,6 @@ export async function POST(
       processingStarted: true,
     };
     
-    // Prepare Shiprocket order data
     const shipRocketOrderData: ShipRocketOrderData = {
       order_id: id,
       order_date: formatDate(new Date()),
@@ -194,49 +193,33 @@ export async function POST(
       height: "10",
       weight: "1"
     };
-
-    // Create Shiprocket order with timeout
-    const shipRocketPromise = new Promise<ShipRocketResponse>(async (resolve, reject) => {
-      try {
-        const response = await axiosinstance.post<ShipRocketResponse>(
-          "/orders/create/adhoc",
-          shipRocketOrderData,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${token}`
-            },
-            timeout: 8000
-          }
-        );
-        resolve(response.data);
-      } catch (error: any) {
-        console.error("Shiprocket Error:", error.response?.data?.message || error.message);
-        reject(error);
+    
+    const createShipRocketOrder = await axiosinstance.post<ShipRocketResponse>(
+      "/orders/create/adhoc",
+      shipRocketOrderData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        timeout: 8000
       }
-    });
-
-    // Wait for Shiprocket order with timeout
-    const createShipRocketOrder = await Promise.race([
-      shipRocketPromise,
-      new Promise<null>((_, reject) =>
-        setTimeout(() => reject(new Error("Shiprocket timeout")), 8000)
-      )
-    ]).catch(error => {
+    ).then((data) => {
+      return data.data;
+    }).catch(error => {
       console.error("Shiprocket order creation failed:", error);
       return null;
     });
 
-    // Update order with shipment ID if available
-    if (createShipRocketOrder?.shipment_id) {
-      await retryOperation(async () => {
-        await updateDoc(doc(db, "stores", params.storeId, "orders", id), {
-          shipment_id: createShipRocketOrder.shipment_id,
-          shiprocket_status: "created"
-        });
+    if (!createShipRocketOrder) {
+      return NextResponse.json({
+        error: "Shiprocket order creation failed"
+      }, {
+        status: 500,
+        headers: corsHeaders
       });
     }
-
+    
     return NextResponse.json({
       id,
       shipment_id: createShipRocketOrder?.shipment_id,
