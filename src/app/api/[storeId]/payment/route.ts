@@ -70,15 +70,6 @@ export async function POST(
             );
         }
 
-        const docRef = doc(db, "stores", params.storeId, "orders", id);
-        await updateDoc(docRef, {
-            ...orderData,
-            id,
-            session_id: data.payment_session_id,
-            shiprocket_id: shipment_id,
-            updatedAt: serverTimestamp(),
-        });
-
         const paymentUrl = new URL(process.env.PAYMENT_URL! || "");
         paymentUrl.searchParams.append("session_id", data.payment_session_id!);
         paymentUrl.searchParams.append("store_id", params.storeId);
