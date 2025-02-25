@@ -62,7 +62,7 @@ const CategoriesPageDetails = ({ categories }: CategoriesPageDetailsProps) => {
                       className="bg-green text-white hover:bg-green/90 px-4 rounded-xl"
                       onClick={() => (
                         setRedirecting(true),
-                        router.push(`/products/11ZNSYJ369IP31CNBvBH`)
+                        router.push(`https://sapsymphony.in`)
                       )}
                     >
                       View Details

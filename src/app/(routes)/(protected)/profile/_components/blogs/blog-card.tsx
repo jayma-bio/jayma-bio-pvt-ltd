@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { UploadDropzone } from "@/lib/uplaodthing";
 import { Block } from "@blocknote/core";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
+import { Loader2, LucideLoader2, X } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -46,7 +46,7 @@ const BlogCard: React.FC<BlogCardProps> = ({
   onSubmit,
 }) => {
   const [blocks, setBlocks] = useState<Block[]>([]);
-  const [uploadedImage, setUploadedImage] = useState<string>("");
+  const [uploadedImage, setUploadedImage] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
   const AddEditor = useMemo(
@@ -84,12 +84,12 @@ const BlogCard: React.FC<BlogCardProps> = ({
       }
     }
   }, [initialData]);
-  
+
   const handleImageUpload = (
     res: ClientUploadedFileData<{ uploadedBy: string }>[]
   ) => {
     if (res && res.length > 0) {
-      setUploadedImage(res[0].url);
+      setUploadedImage([res[0].url]);
       form.setValue("thumbnail", res[0].url);
       toast.success("Image uploaded successfully");
     }
@@ -105,6 +105,7 @@ const BlogCard: React.FC<BlogCardProps> = ({
               ...data,
               id: initialData?.id,
               content: JSON.stringify(blocks),
+              userId: user?.user?.id,
             }
           : {
               ...data,
@@ -113,6 +114,7 @@ const BlogCard: React.FC<BlogCardProps> = ({
               name: user?.user?.name,
               userName: user?.user?.username,
               userImage: user?.user?.image,
+              userId: user?.user?.id,
               content: JSON.stringify(blocks),
             };
 
@@ -131,6 +133,17 @@ const BlogCard: React.FC<BlogCardProps> = ({
       setLoading(false);
     }
   };
+
+  function handleImageDelete(image: string): void {
+    setLoading(true);
+    try {
+      setUploadedImage((prev) => prev.filter((img) => img !== image));
+    } catch (error) {
+      console.error("Error deleting image:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="w-full mx-auto p-6 h-full">
@@ -151,7 +164,7 @@ const BlogCard: React.FC<BlogCardProps> = ({
           <FormField
             control={form.control}
             name="thumbnail"
-            render={({ field }) => (
+            render={() => (
               <FormItem>
                 <FormControl>
                   <UploadDropzone
@@ -167,6 +180,30 @@ const BlogCard: React.FC<BlogCardProps> = ({
               </FormItem>
             )}
           />
+          <div className="flex gap-4">
+            {uploadedImage &&
+              uploadedImage.map((image, index) => (
+                <div
+                  className="relative w-32 object-cover rounded-md group"
+                  key={index}
+                >
+                  <img src={image} alt="Product Image" className="rounded-md" />
+                  {!loading ? (
+                    <button
+                      type="button"
+                      onClick={() => handleImageDelete(image)}
+                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                    >
+                      <X size={16} />
+                    </button>
+                  ) : (
+                    <div className="absolute top-1 right-1 bg-primary p-1 text-white rounded-full">
+                      <LucideLoader2 size={16} className="animate-spin" />
+                    </div>
+                  )}
+                </div>
+              ))}
+          </div>
 
           <FormField
             control={form.control}

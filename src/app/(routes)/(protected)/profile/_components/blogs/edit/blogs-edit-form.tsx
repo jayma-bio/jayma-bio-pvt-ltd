@@ -50,7 +50,7 @@ const EditBlogForm = ({ blogId, initialBlog }: EditBlogFormProps) => {
           setLoading(false);
         }
       };
-      
+
       fetchBlog();
     }
   }, [blogId, initialBlog]);
@@ -62,7 +62,7 @@ const EditBlogForm = ({ blogId, initialBlog }: EditBlogFormProps) => {
       }
     });
   };
-  
+
   if (loading) {
     return <Loader />;
   }

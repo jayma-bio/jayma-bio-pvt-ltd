@@ -6,6 +6,8 @@ import {
   Plus,
   Pencil,
   Trash2,
+  Mail,
+  Archive,
   Clock10,
   Check,
 } from "lucide-react";
@@ -24,18 +26,7 @@ import { Switch } from "@/components/ui/switch";
 import { getBlogs } from "@/actions/blogs/get-blogs";
 import { deleteBlog } from "@/actions/blogs/delete-blog";
 import { useUserData } from "@/hooks/user-data";
-
-interface Blog {
-  id: string;
-  thumbnail: string;
-  title: string;
-  content: any;
-  likes: number;
-  toggle?: boolean;
-  archived?: boolean;
-  role?: string;
-  userName?: string;
-}
+import { Blog } from "@prisma/client";
 
 const BlogComponent = () => {
   const [blogs, setBlogs] = useState<Blog[]>([]);
@@ -87,7 +78,9 @@ const BlogComponent = () => {
     fetchBlogs();
   }, []);
 
-  const filteredBlog = blogs.filter((blog) => blog.userName === user?.username);
+  const filteredBlog = blogs.filter(
+    (blog) => blog.role === user?.role && blog.userId === user?.id
+  );
 
   return (
     <>
@@ -109,7 +102,7 @@ const BlogComponent = () => {
                 <TableHead>Thumbnail</TableHead>
                 <TableHead>Title</TableHead>
                 <TableHead className="text-center">Likes</TableHead>
-                <TableHead className="text-center">Archive</TableHead>
+                <TableHead className="text-center">Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -146,7 +139,7 @@ const BlogComponent = () => {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
-                          <Link href={`/admin/blogs/edit/${blog.id}`}>
+                          <Link href={`/profile/blogs/edit/${blog.id}`}>
                             <Button variant="outline" size="sm">
                               <Pencil className="w-4 h-4" />
                             </Button>
