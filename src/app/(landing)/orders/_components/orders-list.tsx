@@ -14,7 +14,7 @@ interface OrderListpageProps {
 
 const OrderListpage = ({ orders }: OrderListpageProps) => {
   const { user } = useUserData();
-  const formatedOrders = orders?.filter((order) => order.userId === user?.id);
+  const formatedOrders = orders?.filter((order) => order.userId === user?.id && order.isPaid === true);
 
   return (
     <section className="w-full min-h-screen h-full flex flex-col max-w-screen-2xl mx-auto gap-3 md:gap-5 px-5 md:px-10 lg:px-14 mt-5 md:mt-12 py-4 md:py-6">
