@@ -109,14 +109,7 @@ const CartDetails = ({ userId }: CartDetailsProps) => {
         }
       });
 
-      const accessToken = await axios.get(`/api/shiprocket`);
-
-      if (!accessToken.data.token) {
-        toast.error("Shiprocket authentication error. Please try again.");
-        return;
-      }
-
-      const addFirebase = await axios.post(
+      const res = await axios.post(
         `${URL?.payment}/checkout`,
         {
           userId,
@@ -133,31 +126,14 @@ const CartDetails = ({ userId }: CartDetailsProps) => {
         }
       );
 
-      const res1 = await axios.post(`${URL?.app}/checkout`, {
-        userId,
-        products: cart.items,
-        paymentPrice: finalPrice.toFixed(2),
-        name: formData.name,
-        phone: formData.phone,
-        email: formData.email,
-        country: formData.country,
-        state: formData.state,
-        city: formData.city,
-        pincode: formData.pincode,
-        address: formData.address,
-        token: accessToken.data.token,
-        orderId: addFirebase.data.id,
-      });
-
       const res2 = await axios.post(`${URL?.app}/payment`, {
         userId,
         phone: formData.phone,
         email: formData.email,
         name: formData.name,
         paymentPrice: finalPrice.toFixed(2),
-        id: res1.data.id,
-        shipment_id: res1.data.shipment_id,
-        orderData: res1.data.orderData,
+        id: res.data.id,
+        orderData: res.data.orderData,
       });
       router.push(res2.data.url);
     } catch (error) {

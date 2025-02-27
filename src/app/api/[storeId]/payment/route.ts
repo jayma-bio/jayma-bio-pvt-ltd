@@ -17,10 +17,10 @@ export async function POST(
     Cashfree.XEnvironment = Cashfree.Environment.PRODUCTION;
 
     try {
-        const { userId, phone, email, name, paymentPrice, id, shipment_id, orderData } = await req.json();
+        const { userId, phone, email, name, paymentPrice, id, orderData } = await req.json();
 
         // Input validation
-        if (!userId || !phone || !email || !name || !paymentPrice || !id || !shipment_id || !orderData) {
+        if (!userId || !phone || !email || !name || !paymentPrice || !id  || !orderData) {
             console.log("Missing required fields:", {
                 userId,
                 phone,
@@ -28,7 +28,6 @@ export async function POST(
                 name,
                 paymentPrice,
                 id,
-                shipment_id,
                 orderData
             });
             return NextResponse.json(
